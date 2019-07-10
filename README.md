@@ -40,15 +40,15 @@ cd squad-3-ad-data-science
 
 ### Model Frequency
 
-> Describe the interval frequency and estimated total time to run
+> Describe the interval frequency and estimated total time to run.
 
 ### Model updating
 
-> Describe how your model may be updated in the future
+> Describe how your model may be updated in the future.
 
 ### Maintenance
 
-> Describe how your model may be maintained in the future
+> Describe how your model may be maintained in the future.
 
 ### Minimum viable product
 
