@@ -1,5 +1,20 @@
+import pickle
+import json
+from os.path import isfile, join
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
 import fire
+from loguru import logger
+from sklearn.model_selection import train_test_split
+
 from squad_3_ad_data_science import config  # noqa
+from squad_3_ad_data_science.model_training import create_mini_batch_kmeans
+from squad_3_ad_data_science.feature_engineering import (pipeline_data,
+                                                         select_features)
+from squad_3_ad_data_science.recomendations import make_recomendation
+from squad_3_ad_data_science.validation import custom_apk
 
 
 def features(**kwargs):
@@ -25,6 +40,48 @@ def features(**kwargs):
     """
     print("==> GENERATING DATASETS FOR TRAINING YOUR MODEL")
 
+    # As we do not count on obtaining new dataset dinamically, this function
+    # just checks if the expected datasets are present on the right folder
+    if not isfile(config.train_dataset):
+        logger.error(f'Train dataset `{config.train_dataset}` not found.' +
+                     'Model cannot be trained.')
+
+        exit(1)
+
+    else:
+        logger.info(f'Train dataset `{config.train_dataset}` found!')
+
+    for test_ds in config.test_datasets:
+        if not isfile(test_ds):
+            logger.error(f'Test dataset `{config.train_dataset}` not found.' +
+                         'Model may not be tested. Fix or remove from tests.')
+
+        else:
+            logger.info(f'Test dataset `{config.train_dataset}` found!')
+
+    logger.info('Loading data')
+    pure_data = pd.read_csv(config.train_dataset, index_col=0)
+
+    old_shape = pure_data.shape
+    logger.info('Working on features')
+    try:
+        data = pipeline_data(pure_data)
+    except Exception:
+        logger.error('Something where wrong')
+        exit(1)
+
+    logger.info('Selecting variables with PCA')
+
+    data = select_features(data)
+
+    logger.info(f'Data original shape: {old_shape}')
+    logger.info(f'Data treining shape: {data.shape}')
+
+    # Save dataset as pickle file
+    data_path = join(config.data_path, config.TRAIN_DATA_PKL)
+    data.to_pickle(data_path)
+    logger.info(f'Data saved as `{data_path}`')
+
 
 def train(**kwargs):
     """Function that will run your model, be it a NN, Composite indicator
@@ -41,9 +98,31 @@ def train(**kwargs):
     """
     print("==> TRAINING YOUR MODEL!")
 
+    # Load data and create model
+    data = pd.read_pickle(join(config.data_path, config.TRAIN_DATA_PKL))
+    model, labels = create_mini_batch_kmeans(data, return_labels=True)
+
+    # Save data with cluster label
+    data['label'] = labels
+    labeld_data_pkl_path = join(config.data_path,
+                                config.TRAIN_DATA_PKL_LABELED)
+    data.to_pickle(labeld_data_pkl_path)
+
+    logger.info(f'Labeled data saved as `{labeld_data_pkl_path}`')
+
+    # Save model
+    model_path = join(config.models_path, config.MBK_PICKLE)
+    with open(model_path, 'wb') as f:
+        pickle.dump(model, file=f)
+
+    logger.info(f'Model saved as `{model_path}`')
+
 
 def metadata(**kwargs):
     """Generate metadata for model governance using testing!
+
+    Kwargs:
+        update: Write new registers for equal names. Default: True
 
     NOTE
     ----
@@ -66,6 +145,78 @@ def metadata(**kwargs):
     }
     """
     print("==> TESTING MODEL PERFORMANCE AND GENERATING METADATA")
+
+    # Kwargs processing
+    if 'update' in kwargs.keys():
+        update = kwargs['update']
+        logger.info(f'Update flag found.')
+
+    else:
+        update = True
+
+    # Load saved labeled data
+    labeld_data_pkl_path = join(config.data_path,
+                                config.TRAIN_DATA_PKL_LABELED)
+    data = pd.read_pickle(labeld_data_pkl_path)
+
+    # TODO apply Nathan's function to calculate Average PRecision for each csv on tests
+
+    # Try to load previous test performance file, to add new tests
+    if isfile(config.performance_metadata_path):
+        logger.info(f'File `{config.performance_metadata_path}` ' +
+                    'found. Reading...')
+        with open(config.performance_metadata_path) as jf:
+            perf = json.load(jf)
+
+    else:
+        logger.info(f'No previous perfomance file found. Creatings new...')
+        perf = dict()
+
+    # Run over each test file, loading its ids and running the prediction
+    for f in config.test_datasets:
+        if not isfile(f):
+            logger.error(f'Test file `{f}` not find. Ignoring...`')
+            continue
+
+        logger.info(f'Processing file `{f}`...')
+
+        # Label to identify register
+        name = f.split('/')[-1][:-4]
+
+        user_data = pd.read_csv(f, index_col=0)
+        user_ids = user_data['id'].tolist()
+
+        train, test = train_test_split(user_ids, test_size=config.TEST_SIZE)
+
+        apk_values = dict()
+        for k in config.APK_VALUES:
+            ordered_recs = make_recomendation(data, train, k)
+            
+            score = custom_apk(market_list=ordered_recs,
+                               test_list=test,
+                               k=k)
+
+            apk_values[f'apk@{k}'] = score
+
+        # rename name to something to avoid overwrite older
+        if not update and name in perf.keys():
+            c = 1
+            while name + f'_{c}' in perf.keys():
+                c += 1
+
+            name = name + f'_{c}'
+
+        perf[name] = {
+            'last_update': str(datetime.now()),
+            'from_file': f,
+            'scores': apk_values,
+        }
+
+    with open(config.performance_metadata_path, 'w') as f:
+        json.dump(perf, f)
+
+    logger.info(f'Metadata generation finished. Results ' +
+                f'available in `{config.performance_metadata_path}`')
 
 
 def predict(input_data):

@@ -126,6 +126,8 @@ dmypy.json
 # Datasets
 *.csv
 
-
 # vscode config file
 .vscode/
+
+# Pickle files
+*.pkl
