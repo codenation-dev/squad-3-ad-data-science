@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder
 
 from squad_3_ad_data_science import config
+from squad_3_ad_data_science.exceptions import ConfigMissException
 
 
 def pipeline_data(input_data: pd.DataFrame):
@@ -22,9 +23,9 @@ def pipeline_data(input_data: pd.DataFrame):
     try:
         input_data.set_index('id', inplace=True)
 
-    except KeyError:
+    except KeyError as e:
         logger.error('`id` col is not present. Check your train data.')
-        exit(1)
+        raise e
 
     # Remove variables configured on config.TO_REMOVE
     input_data.drop(axis=1, labels=config.TO_REMOVE, inplace=True)
@@ -43,18 +44,18 @@ def pipeline_data(input_data: pd.DataFrame):
         for col in config.TO_FIX_OBJ2BOOL:
             input_data[col] = input_data[col].astype('bool')
 
-    except KeyError:
+    except KeyError as e:
         logger.error(f'Col {col} is not present. Check your train data or ' +
                      'config.TO_FIX_OBJ2BOOL.')
-        exit(1)
+        raise e
 
     # Impute as set on config.NAN_FIXES
     try:
         input_data = impute_as_config(input_data)
 
-    except ConfigMissException:
+    except ConfigMissException as e:
         logger.error(f'Error ocurred while imputing data')
-        raise
+        raise e
 
     logger.info('Data imputed as config')
 
@@ -106,19 +107,19 @@ def manual_ordinal_encoder(input_data: pd.DataFrame):
     for col, info in config.ORDINAL_ENCODE.items():
         try:
             input_data[col]
-        except KeyError:
+        except KeyError as e:
             logger.error(f'Column {col} is not present on ' +
                          'dataframe')
-            raise ConfigMissException()
+            raise e
 
         try:
             for key, value in info.items():
                 input_data[col] = input_data[col].replace(key, value)
 
-        except KeyError:
+        except KeyError as e:
             logger.error(f'config.ORDINAL_ENCODE is with some value ' +
                          f'error on col {col} and info {info}')
-            raise ConfigMissException()
+            raise e
 
     return input_data
 
@@ -157,12 +158,13 @@ def impute_as_config(input_data: pd.DataFrame):
     for col, info in config.NAN_FIXES.items():
         # Casting for helping mypy
         info = typing.cast(typing.Dict, info)
+
         try:
             input_data[col]
         except KeyError:
             logger.error(f'Column {col} is not present on ' +
                          'dataframe')
-            raise ConfigMissException()
+            raise ConfigMissException('Column not present')
 
         try:
             if info['method'] == 'const':
@@ -186,16 +188,9 @@ def impute_as_config(input_data: pd.DataFrame):
         except KeyError:
             logger.error(f'config.NAN_FIXES is with some value ' +
                          f'error on col {col} with info = {info}')
-            raise ConfigMissException()
+            raise ConfigMissException('Configuration fail')
 
     return input_data
-
-
-class ConfigMissException(Exception):
-    '''
-        @brief Exception for fails on configuration file
-    '''
-    pass
 
 
 def select_features(input_data: pd.DataFrame):

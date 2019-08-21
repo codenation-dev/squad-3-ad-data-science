@@ -1,22 +1,17 @@
 # [`squad-3-ad-data-science`]
-> Simple project description.
 
-This model is a `type_of_modeling` that `do_something` to solve `this_problem` aimed to the clients of the `some_vertical`.
+This model is a `recomendation system` that analise a market to recommend leads to users with a previous list of clients that are inside the market.
 
 ## Stakeholders
-> Describe the people involved in this project
 
 | Role           | Responsibility | Full name                      | e-mail                           |
 | -------------- | -------------- | ------------------------------ | -------------------------------- |
-| Data Scientist | Author         | [`Julio Machado Pontes`]       | [`machadopontes@gmail.com`]      |
 | Data Scientist | Author         | [`Lincoln Vinicius Schreiber`] | [`lincolnschreiber@gmail.com`]   |
 | Data Scientist | Author         | [`Murilo Menezes Mendonça`]    | [`murilommen@gmail.com`]         |
 | Data Scientist | Author         | [`Nathan dos Santos Nunes`]    | [`nathan.sn@hotmail.com`]        |
 | Data Scientist | Author         | [`Thiago Sant' Helena`]        | [`thiago.sant.helena@gmail.com`] |
-| Project Owner  | Co-author      | [`First name Last Name`]       | [`e-mail`]                       |
 
 ## Usage
-> Describe how to reproduce your model
 
 Usage is standardized across models. There are two main things you need to know, the development workflow and the Makefile commands.
 
@@ -26,37 +21,61 @@ All you'll need to have setup is Docker and Git, which you probably already have
 
 Makefile commands can be accessed using `make help`.
 
-
 Make sure that **docker** is installed.
 
 Clone the project from the analytics Models repo.
 ```
 git clone https://github.com/<@github_username>/squad-3-ad-data-science.git
 cd squad-3-ad-data-science
+mkdir workspace/data
+mkdir workspace/models
 ```
+
+Be sure to configure train and test data on `squad_3_ad_data_science/config.py`, placing files on `workspace/data` folder.
+
+To train and generate test metadata, run 
+```
+make run
+```
+
+Performance metadata available on `workspace/performance.json`
+
+To get recomendations, run
+```
+make predict INPUT='<path_to_input_file_with_column_of_ids>' PARAMS='--k 10'
+```
+
+Param `k` stands for the number of recomendations. Default is 10.
 
 
 ## Final Report (to be filled once the project is done)
 
 ### Model Frequency
 
-> Describe the interval frequency and estimated total time to run
+`make run` takes ~5 min (assuming installed libraries)
+
+`make predict` takes less than 1min
+
 
 ### Model updating
 
-> Describe how your model may be updated in the future
+More filtering and feature tunning can be added to `feature_engineering.py`, more validation functions to generate extra metadata for model validation on `validation.py` and more recomendation functions on `recomendations.py`.
+
+`main.py` must be updated to apply new methods.
+
+Keep logs with `loguru`.
 
 ### Maintenance
 
-> Describe how your model may be maintained in the future
+To deploy as web application, use functions implemented on module to make predicts with `main.predict(input_file, **kwargs)`. 
 
 ### Minimum viable product
 
-> Describe a minimum configuration that would be able to create a minimum viable product.
+--
 
 ### Early adopters
 
-> Describe any potential paying users for this product if it was available today. Also state a point of contact for each of them.
+--
 
 ## Documentation
 

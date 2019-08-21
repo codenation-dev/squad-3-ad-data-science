@@ -23,98 +23,60 @@
 ## Summary
 > The table below summarizes the key requirements for the project.
 
-| problem type              | target population | entity | N_target | min_coverage | N_labeled | sucess_metrics | updt_freq |
-|---------------------------|-------------------|--------|----------|--------------|-----------|----------------|-----------|
-| multilabel classification | restaurants       | CNPJ   | 30M      | 80%          | NA        | NA             | monthly   |
+| problem type                             | target population | entity | N_target | min_coverage | N_labeled | sucess_metrics      | updt_freq   |
+|------------------------------------------|-------------------|--------|----------|--------------|-----------|---------------------|-------------|
+| content based filter for recommendations | business          | CNPJ   |  -       | 80%          | NA        | average precision   | as new companies come in dataset     |
 
 
 ### Objective
-> Provide a short (max 3-line) description  of the project's objective.
 
-"This project aims at developing a model to automatically determine the type of cuisine of a establishment."
+This project aims at developing a model to recommend leads for a company based on its previous clients.
 
 ### Target population
-> More detailed description of the population to which the model should apply. Include any relevant characteristics.
 
 | Entity | Region | Type        | Size | Status | Sector   | N_target |
 |--------|--------|-------------|------|--------|----------|----------|
-| CNPJ   | Brasil | restaurants | any  | active | services | 30M      |
+| CNPJ   | Brasil | companies   | any  | active | -        | -        |
 
 
 #### Subsetting
-> Also provide a list of sub-setting variables and how they related to the target population.
 
-| Subsetting variable  | Selection rule                               |
-|----------------------|----------------------------------------------|
-| `cd_ramo_atividade`  | belongs to ['5611201', '5611202', '5611202'] |
-| `situacao_cadastral` | 'Ativa'                                      |
+Variables present in `config.SPECIAL_LABELS` are used to filter market to make recomendations. Model removes from recomendations possibilities all rows that do not share its special labels with at least one row of user's portfolio for each label.
+
+Initially used special labels:
+| Label                                 | Based on      |
+|---------------------------------------|---------------|
+| `setor`                               | Tests & business knowledge (little)        | 
+| `de_faixa_faturamento_estimado_grupo` | Tests         |
+
+`predict` function offer option to do not use special labels on recomendation.
 
 ### Output specification
-> Describe how the output of the model will be delivered, including its domain and metadata.
 
-The model outputs a list of strings from the list `output_set`
-```python
-output_set = ['','pizza','mexicano','bar','churrascaria']
-output_example1 = [''] # none
-output_example2 = ['pizza','churrascaria']
-```
+The model will outputs a list of string that will be a subset of `id` column of input file.
 
 #### Metadata
-> Your model's metada should be provided in a machine-readable format (e.g. a json file) and include the following items:
 
-* a brief description: this model predicts the type of a restaurant cuisine
-* a measure of accuracy applicable for use of the model in other setups (if applicable): standard deviation, accuracy, error matrix.
-* model version
-* author
-* date created
-* link to training data
+[Metadata file](../squad_3_ad_data_science/project_metadata.json)
 
 ### Problem type
-> Describe to which Data Science problem type(s) this project relates to with a brief motivation.
 
-"Since the objective is to assign one or more labels to an entity, this problem is a multi-label classification. It is also unsupervised since no observed data is available."
+As the problem is make recomendations for a user with a portfolio, based only on it's portfolio. So, the model should be a content-based filter, validated by metrics that analyze results of recomendations.
 
-## Solution architecture [Should this be here? Shouldn't we define a common archtecture?]
-> This section describes the architecture of your solution. It should clarify:
+## Solution architecture
 
-* how and where from your model will consume data,
-* how and where to your model will generate predictions,
-* interaction with a scheduler, API or application,
-* interaction with a model managing system.
+The model should consume data from total market's dataset, restricting input `id`s possiblities by market dataset's `id`s. 
 
-Provide a schematic describing how your model will consume data, evaluate the model's output and deliver it to the application. You can use [Lucidchart](https://www.lucidchart.com) for the drawings.
+For current version, user must put `estaticos_market.csv` train file and and `estaticos_portfolio<1, 2, 3>.csv`  test files on data folder.
+
+To generate predictions, put input file on predict folder and run `make predict INPUT='<path_to_file>'`. 
+
 
 ### Limitations and risks
-> Provide a list with the main limitations and the associated risks for this project. (lile are supposed to be a well-educated guess)
 
 | Limitation                              | Likelihood | Loss                               | Contingency                        |
 |-----------------------------------------|------------|------------------------------------|------------------------------------|
-| Nonexistence of observed data           | 100%       | not possible to validate the model | Create a data partnership with VR. |
-| High false positives rate for `m_regex` | 30%        | lack of quality and trust          | Fine tuning of filters.            |
+| User's portfolio contains new ids           | 100%       | not possible make prediction | Update market list |
+| User's portfolio with high variance | 50%        | predictions could be near to random          | -            |
 
 
-### Indexing [OPTIONAL - fill this up if it does not follow conventional pipeline]
-> Describe how your model's outputs will be indexed in the application. Provide any details that affect how the model should produce its outputs.
-
-## Related resources [OPTIONAL]
-> Short listing of related datasets and some specifications.
-
-### Related and observed datasets [OPTIONAL - may not apply]
-> List any related and observed datasets that can be used for your project.
-
-| table name                | observed? | description                                             | Why relevant                                            | Update frequency |
-|---------------------------|-----------|---------------------------------------------------------|---------------------------------------------------------|------------------|
-| data_science_sp.vr_ticket | yes       | contains 8M payouts made at VR-accepting establishments | Can be used to validate model                           | once             |
-| data_science.geo          | no        | contains features of a given region                     | can help create geolocalization features to the problem | yearly           |
-
-
-### Data partners [OPTIONAL - may not apply]
-> State the datasets available from data partnerships, including a description of restrictions that may apply.
-
-| partner | N  | label? | schema                                  | restrictions | terms | responsible     |
-|---------|----|--------|-----------------------------------------|--------------|-------|-----------------|
-| VR      | 1M | yes    | `data_science_sp.vr_transacoes_consumo` | none         | link  | @luana.grandino |
-
-
-## Additional resources [OPTIONAL]
-> Provide links to additional documentation and presentations regarding your project specification.

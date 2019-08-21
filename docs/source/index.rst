@@ -1,4 +1,4 @@
-Welcome to project's documentation!
+Welcome to squad_3_ad_data_science's documentation!
 ==========================================
 
 .. toctree::

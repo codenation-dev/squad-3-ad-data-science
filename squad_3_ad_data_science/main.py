@@ -65,8 +65,8 @@ def features(**kwargs):
     logger.info('Working on features')
     try:
         data, special_labels_df = pipeline_data(pure_data)
-    except Exception:
-        logger.error('Something where wrong')
+    except Exception as e:
+        logger.error(f'Error during pipeline. Exception text: {e}')
         exit(1)
 
     logger.info('Selecting variables with PCA')
@@ -235,6 +235,8 @@ def predict(input_data, **kwargs):
                                          default False
             --use_sp_labels <True/False>: To use special labels from config,
                                           default True
+            --return <True/False>: To return recomendations. If False, func
+                                    will print then. Default: False
 
     NOTE
     ----
@@ -262,6 +264,12 @@ def predict(input_data, **kwargs):
         use_sp_labels = kwargs['use_sp_labels']
     else:
         use_sp_labels = True
+
+    if 'return' in kwargs.keys():
+        return_recs = kwargs['return']
+
+    else:
+        return_recs = False
 
     # Grant that input_data exists
     if not isfile(input_data):
@@ -292,10 +300,14 @@ def predict(input_data, **kwargs):
                                      use_sp_labels=use_sp_labels)
 
     recomendations = ordered_ids[:k]
-    print('-- 0 is the most recomended lead. --')
-    print(f'| rank  |  id')
-    for i, r in enumerate(recomendations):
-        print(f'|   {i}   | {r}')
+    if not return_recs:
+        print('-- 0 is the most recomended lead. --')
+        print(f'| rank  |  id')
+        for i, r in enumerate(recomendations):
+            print(f'|   {i}   | {r}')
+    
+    else:
+        return recomendations
 
 
 # Run all pipeline sequentially

@@ -24,7 +24,7 @@ APK_VALUES = [
     10000
 ]
 
-# test_size for metadate generation
+# test_size for metadata generation
 TEST_SIZE = 0.3
 
 base_path = path.dirname(path.dirname(squad_3_ad_data_science.__file__))
@@ -106,10 +106,6 @@ NAN_FIXES = {
         'method': 'const',
         'value': 0,
     },
-    # 'vl_faturamento_estimado_aux': {
-    #     'method': 'median',
-    #     'value': None,
-    # },
     'idade_minima_socios': {
         'method': 'mean',
         'value': None,
@@ -118,10 +114,6 @@ NAN_FIXES = {
         'method': 'const',
         'value': True,
     },
-    # 'nm_segmento': {
-    #     'method': 'const',
-    #     'value': 'OUTRAS ATIVIDADES DE SERVICOS',
-    # },
     'qt_socios_pj': {
         'method': 'const',
         'value': 0,
