@@ -128,8 +128,8 @@ check: build lint tests
 
 tests:
 	@printf $(STATUS_PREFIX); echo "RUN UNIT-TESTS"
-	$(DOCKER_RUN) --entrypoint="pytest" $(IMAGE) \
-				  --cov=$(PACKAGE)/
+	$(DOCKER_RUN) --entrypoint="pytest" $(IMAGE)
+				#   --cov=$(PACKAGE)/
 
 lint: flake8 mypy bandit
 

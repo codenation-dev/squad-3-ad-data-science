@@ -1,9 +1,8 @@
-import pickle
+import pickle  # nosec
 import json
 from os.path import isfile, join
 from datetime import datetime
 
-import numpy as np
 import pandas as pd
 import fire
 from loguru import logger
@@ -65,7 +64,7 @@ def features(**kwargs):
     old_shape = pure_data.shape
     logger.info('Working on features')
     try:
-        data = pipeline_data(pure_data)
+        data, special_labels_df = pipeline_data(pure_data)
     except Exception:
         logger.error('Something where wrong')
         exit(1)
@@ -73,9 +72,16 @@ def features(**kwargs):
     logger.info('Selecting variables with PCA')
 
     data = select_features(data)
+    # Less 1, disconsidering cluster
+    logger.info(f'Selected {len(data.columns)-1} features for' +
+                f' a {config.EXPLAINED_VARIANCE_RATIO*100}% variance' +
+                f' representation')
+    logger.info(f'Concatenating special labels')
+
+    data = data.join(special_labels_df)
 
     logger.info(f'Data original shape: {old_shape}')
-    logger.info(f'Data treining shape: {data.shape}')
+    logger.info(f'Data training shape: {data.shape}')
 
     # Save dataset as pickle file
     data_path = join(config.data_path, config.TRAIN_DATA_PKL)
@@ -103,7 +109,7 @@ def train(**kwargs):
     model, labels = create_mini_batch_kmeans(data, return_labels=True)
 
     # Save data with cluster label
-    data['label'] = labels
+    data[config.CLUSTER_LABEL] = labels
     labeld_data_pkl_path = join(config.data_path,
                                 config.TRAIN_DATA_PKL_LABELED)
     data.to_pickle(labeld_data_pkl_path)
@@ -159,8 +165,6 @@ def metadata(**kwargs):
                                 config.TRAIN_DATA_PKL_LABELED)
     data = pd.read_pickle(labeld_data_pkl_path)
 
-    # TODO apply Nathan's function to calculate Average PRecision for each csv on tests
-
     # Try to load previous test performance file, to add new tests
     if isfile(config.performance_metadata_path):
         logger.info(f'File `{config.performance_metadata_path}` ' +
@@ -186,12 +190,14 @@ def metadata(**kwargs):
         user_data = pd.read_csv(f, index_col=0)
         user_ids = user_data['id'].tolist()
 
-        train, test = train_test_split(user_ids, test_size=config.TEST_SIZE)
+        train, test = train_test_split(user_ids,
+                                       test_size=config.TEST_SIZE,
+                                       random_state=42)
 
         apk_values = dict()
         for k in config.APK_VALUES:
-            ordered_recs = make_recomendation(data, train, k)
-            
+            ordered_recs = make_recomendation(data, train)
+
             score = custom_apk(market_list=ordered_recs,
                                test_list=test,
                                k=k)
@@ -209,6 +215,7 @@ def metadata(**kwargs):
         perf[name] = {
             'last_update': str(datetime.now()),
             'from_file': f,
+            'test_size': config.TEST_SIZE,
             'scores': apk_values,
         }
 
@@ -219,8 +226,15 @@ def metadata(**kwargs):
                 f'available in `{config.performance_metadata_path}`')
 
 
-def predict(input_data):
+def predict(input_data, **kwargs):
     """Predict: load the trained model and score input_data
+
+        @kwargs:
+            --k <value>: number of leads, default 10
+            --use_clusters <True/False>: To use clusters,
+                                         default False
+            --use_sp_labels <True/False>: To use special labels from config,
+                                          default True
 
     NOTE
     ----
@@ -228,6 +242,60 @@ def predict(input_data):
     to do experiments, like predict/input.csv.
     """
     print("==> PREDICT DATASET {}".format(input_data))
+    print("Args: {}".format(kwargs))
+
+    # Arguments reading
+    if 'k' in kwargs.keys():
+        k = kwargs['k']
+        logger.info(f'K argument found. K={k}')
+
+    else:
+        logger.info(f'K=10')
+        k = 10
+
+    if 'use_clusters' in kwargs.keys():
+        use_clusters = kwargs['use_clusters']
+    else:
+        use_clusters = False
+
+    if 'use_sp_labels' in kwargs.keys():
+        use_sp_labels = kwargs['use_sp_labels']
+    else:
+        use_sp_labels = True
+
+    # Grant that input_data exists
+    if not isfile(input_data):
+        logger.error(f'File `{input_data}` not find!')
+        exit(1)
+
+    data = pd.read_csv(input_data)
+
+    try:
+        ids = data['id']
+
+    except KeyError:
+        logger.error(f'Missing id column on input data')
+        exit(1)
+
+    # Load trained data
+    labeld_data_pkl_path = join(config.data_path,
+                                config.TRAIN_DATA_PKL_LABELED)
+    if not isfile(labeld_data_pkl_path):
+        logger.error(f'Trained and labeled data do not exist! ' +
+                     'Train model first.')
+        exit(1)
+
+    train_data = pd.read_pickle(labeld_data_pkl_path)
+
+    ordered_ids = make_recomendation(train_data, ids,
+                                     use_clusters=use_clusters,
+                                     use_sp_labels=use_sp_labels)
+
+    recomendations = ordered_ids[:k]
+    print('-- 0 is the most recomended lead. --')
+    print(f'| rank  |  id')
+    for i, r in enumerate(recomendations):
+        print(f'|   {i}   | {r}')
 
 
 # Run all pipeline sequentially

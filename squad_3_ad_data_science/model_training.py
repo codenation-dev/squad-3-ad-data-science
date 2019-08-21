@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-from loguru import logger
 from sklearn.cluster import MiniBatchKMeans
 
 from squad_3_ad_data_science import config
