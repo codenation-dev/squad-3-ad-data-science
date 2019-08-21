@@ -1,5 +1,4 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
@@ -11,9 +10,15 @@ numpy = "*"
 matplotlib = "*"
 pandas = "*"
 jupyter = "*"
-jinja = "*"
 sklearn = "*"
 jinja2 = "*"
+flake8 = "*"
+bandit = "*"
+mypy = "*"
+loguru = "*"
+fire = "*"
+category-encoders = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.7"
