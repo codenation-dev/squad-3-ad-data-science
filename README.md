@@ -1,6 +1,6 @@
 # [`squad-3-ad-data-science`]
 
-This model is a `recomendation system` that analise a market to recommend leads to users with a previous list of clients that are inside the market.
+This model is a `recomendation system` that analyze a market to recommend leads to users with a previous list of clients that are inside the market.
 
 ## Stakeholders
 
