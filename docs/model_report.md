@@ -15,9 +15,8 @@ Mark which tasks have been performed
 - [ ] **Acceptance**: this model report has been accepted by the Data Science Manager. State name and date.
 
 ## Summary
-> Provide a description of your model, max 3 lines.
 
-The model classifies the type of cuisine of a restaurant. It is based on regular expressions and rules.
+The model is a `lead recommendation system`, it is based on cosine similarity to generate a pairwise similarity score metric between multiple companies.   
 
 ### Usage
 > Provide a reproducible pipeline to run your model
@@ -62,12 +61,11 @@ Make sure that the final consumer of your model can make use of your metadata.
 > target population.
 
 ### Performance Metrics
-Provide any metrics used and their value in tables.
 
-| metric    | `''`   | `'pizza'`   | `'mexicano'`   | `'bar'`   | `'churrascaria'` |
-| --------- | ------ | ----------- | -------------- | --------- | ---------------- |
-| precision | .98    | .8          | .9             | .95       | .99              |
-| recall    | .98    | .8          | .9             | .95       | .99              |
+| metric            | `'portfolio1'`| `'portfolio2'` | `'portfolio3'` |
+| ------------------| ------------- | -------------- | -------------- |
+| Average precision | .0            | .12            | .12            |
+| n of companies    | .98           | .8             | .9             |
 
 ## Pre-processing
 > Motivate each pre-processing used in one line.
