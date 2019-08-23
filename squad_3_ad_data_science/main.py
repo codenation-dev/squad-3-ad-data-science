@@ -52,11 +52,11 @@ def features(**kwargs):
 
     for test_ds in config.test_datasets:
         if not isfile(test_ds):
-            logger.error(f'Test dataset `{config.train_dataset}` not found.' +
+            logger.error(f'Test dataset `{test_ds}` not found.' +
                          'Model may not be tested. Fix or remove from tests.')
 
         else:
-            logger.info(f'Test dataset `{config.train_dataset}` found!')
+            logger.info(f'Test dataset `{test_ds}` found!')
 
     logger.info('Loading data')
     pure_data = pd.read_csv(config.train_dataset, index_col=0)

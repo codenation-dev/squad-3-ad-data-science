@@ -16,7 +16,7 @@ Mark which tasks have been performed
 
 ## Summary
 
-The model make recomendations of leads to users with a portfolio of clients that is entirely present on train data, based on feature filtering, cosine similarity and, optionally, clustering
+The model is a `lead recommendation system`, it is based on cosine similarity to generate a pairwise similarity score metric between multiple companies.   
 
 ### Usage
 
@@ -51,7 +51,10 @@ will be subset of `id`s of `estaticos_market.csv`
 
 ### Performance Metrics
 
--
+| metric            | `'portfolio1'`| `'portfolio2'` | `'portfolio3'` |
+| ------------------| ------------- | -------------- | -------------- |
+| Average precision | .0            | .12            | .12            |
+| n of companies    | .98           | .8             | .9             |
 
 ## Pre-processing
 
