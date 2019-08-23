@@ -1,6 +1,6 @@
 import pickle  # nosec
 import json
-from os.path import isfile, join
+from os.path import isfile, join, basename, splitext
 from datetime import datetime
 
 import pandas as pd
@@ -184,8 +184,9 @@ def metadata(**kwargs):
 
         logger.info(f'Processing file `{f}`...')
 
-        # Label to identify register
-        name = f.split('/')[-1][:-4]
+        # Take from filepath the filename without .csv
+        base = basename(f)
+        name = splitext(base)[0]
 
         user_data = pd.read_csv(f, index_col=0)
         user_ids = user_data['id'].tolist()
@@ -220,7 +221,7 @@ def metadata(**kwargs):
         }
 
     with open(config.performance_metadata_path, 'w') as f:
-        json.dump(perf, f)
+        json.dump(perf, f, indent=4)
 
     logger.info(f'Metadata generation finished. Results ' +
                 f'available in `{config.performance_metadata_path}`')
@@ -305,7 +306,7 @@ def predict(input_data, **kwargs):
         print(f'| rank  |  id')
         for i, r in enumerate(recomendations):
             print(f'|   {i}   | {r}')
-    
+
     else:
         return recomendations
 
