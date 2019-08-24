@@ -75,8 +75,9 @@ To generate predictions, put input file on predict folder and run `make predict 
 
 For our recommendation system, we have divided the portfolios datasets into train and test, considered precision and recall as follows:
 
-Precision = number of test leads inside the recommendations, divided by the total number of recommendations;
-Recall = number of test leads inside the recommendations, divided by the total number of the test subset.
+<img src="https://latex.codecogs.com/png.latex?Precision&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;recommendations}" title="Precision = \frac{number\; of\; test\; leads\; inside\; the\; recommendations}{total\; number\; of\; recommendations}" />
+
+<img src="https://latex.codecogs.com/png.latex?Recall&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;test\;&space;subset}" title="Recall = \frac{number\; of\; test\; leads\; inside\; the\; recommendations}{total\; number\; of\; test\; subset}" />
 
 Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k.
 
