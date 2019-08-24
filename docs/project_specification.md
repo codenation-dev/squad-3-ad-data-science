@@ -71,6 +71,16 @@ For current version, user must put `estaticos_market.csv` train file and and `es
 
 To generate predictions, put input file on predict folder and run `make predict INPUT='<path_to_file>'`. 
 
+### Validation metric (Average Precision)
+
+For our recommendation system, we have divided the portfolios datasets into train and test, considered precision and recall as follows:
+
+Precision = number of test leads inside the recommendations, divided by the total number of recommendations;
+Recall = number of test leads inside the recommendations, divided by the total number of the test subset.
+
+Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k. 
+
+We have used the Average Precision because it gives us an idea of not only the number of leads from the test subset inside the recommendations, but also the position of those leads.
 
 ### Limitations and risks
 
