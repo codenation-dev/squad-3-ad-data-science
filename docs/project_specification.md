@@ -81,7 +81,7 @@ For our recommendation system, we have divided the portfolios datasets into trai
 
 Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k.
 
-<a href="#"><img src="https://latex.codecogs.com/png.latex?AP@k&space;=&space;\sum_{i=1}^{k}(precision\;&space;at&space;\;\mathbf{i})\cdot&space;(change\;&space;in\;&space;recall\;&space;at\;&space;\mathbf{i})&space;=&space;\sum_{i=1}^{k}&space;P(i)\Delta&space;r(i)" title="Average Precision at k Formula" /></a>
+<a><img src="https://latex.codecogs.com/png.latex?AP@k&space;=&space;\sum_{i=1}^{k}(precision\;&space;at&space;\;\mathbf{i})\cdot&space;(change\;&space;in\;&space;recall\;&space;at\;&space;\mathbf{i})&space;=&space;\sum_{i=1}^{k}&space;P(i)\Delta&space;r(i)" title="Average Precision at k Formula" /></a>
 
 We have used the Average Precision because it gives us an idea of not only the number of leads from the test subset inside the recommendations, but also the position of those leads.
 
