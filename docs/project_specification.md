@@ -78,7 +78,9 @@ For our recommendation system, we have divided the portfolios datasets into trai
 Precision = number of test leads inside the recommendations, divided by the total number of recommendations;
 Recall = number of test leads inside the recommendations, divided by the total number of the test subset.
 
-Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k. 
+Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k.
+
+FÓRMULA DA AVERAGE PRECISION AQUI
 
 We have used the Average Precision because it gives us an idea of not only the number of leads from the test subset inside the recommendations, but also the position of those leads.
 
