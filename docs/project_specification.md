@@ -75,13 +75,13 @@ To generate predictions, put input file on predict folder and run `make predict 
 
 For our recommendation system, we have divided the portfolios datasets into train and test, considered precision and recall as follows:
 
-<img src="https://latex.codecogs.com/png.latex?Precision&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;recommendations}" title="Precision = \frac{number\; of\; test\; leads\; inside\; the\; recommendations}{total\; number\; of\; recommendations}" />
+<img src="https://latex.codecogs.com/png.latex?Precision&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;recommendations}" title="Precision Formula" />
 
-<img src="https://latex.codecogs.com/png.latex?Recall&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;test\;&space;subset}" title="Recall = \frac{number\; of\; test\; leads\; inside\; the\; recommendations}{total\; number\; of\; test\; subset}" />
+<img src="https://latex.codecogs.com/png.latex?Recall&space;=&space;\frac{number\;&space;of\;&space;test\;&space;leads\;&space;inside\;&space;the\;&space;recommendations}{total\;&space;number\;&space;of\;&space;test\;&space;subset}" title="Precision Formula" />
 
 Then, we have used the Average Precision at k (AP@k) on each portfolio, to valuate and compare our models, where k is the number of recommendations requested, from rank 1 through k.
 
-<img src="https://latex.codecogs.com/png.latex?AP@K&space;=&space;\sum_{i=1}^{K}(precision\;&space;at&space;\;\mathbf{i})\cdot&space;(change\;&space;in\;&space;recall\;&space;at\;&space;\mathbf{i})&space;=&space;\sum_{i=1}^{K}&space;P(i)\Delta&space;r(i)" title="AP@K = \sum_{i=1}^{K}(precision\; at \;\mathbf{i})\cdot (change\; in\; recall\; at\; \mathbf{i}) = \sum_{i=1}^{K} P(i)\Delta r(i)" />
+<img src="https://latex.codecogs.com/png.latex?AP@k&space;=&space;\sum_{i=1}^{k}(precision\;&space;at&space;\;\mathbf{i})\cdot&space;(change\;&space;in\;&space;recall\;&space;at\;&space;\mathbf{i})&space;=&space;\sum_{i=1}^{k}&space;P(i)\Delta&space;r(i)" title="Average Precision at k Formula" />
 
 We have used the Average Precision because it gives us an idea of not only the number of leads from the test subset inside the recommendations, but also the position of those leads.
 
