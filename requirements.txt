@@ -31,7 +31,7 @@ loguru==0.3.2
 markupsafe==1.1.1
 matplotlib==3.1.1
 mccabe==0.6.1
-mistune==0.8.4
+mistune==2.0.3
 more-itertools==7.2.0
 mypy-extensions==0.4.1
 mypy==0.720
